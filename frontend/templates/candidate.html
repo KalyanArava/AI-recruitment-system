@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Candidate — Smart AI Recruitment</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/glass.css">
+</head>
+<body>
+<div class="g-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="g-sidebar">
+    <div class="brand">
+      <div class="brand-icon">🤖</div>
+      <div class="brand-text">SmartRecruit<span style="color:var(--cyan)">AI</span></div>
+    </div>
+    <nav class="g-nav">
+      <div class="nav-group-label">Overview</div>
+      <button class="g-nav-item active" id="nav-dashboard" onclick="go('dashboard','Dashboard')"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
+      <div class="nav-group-label">Jobs</div>
+      <button class="g-nav-item" id="nav-browse" onclick="go('browse','Browse Jobs')"><span class="nav-icon">🔍</span><span class="nav-label">Browse Jobs</span></button>
+      <button class="g-nav-item" id="nav-applied" onclick="go('applied','My Applications')"><span class="nav-icon">📄</span><span class="nav-label">My Applications</span></button>
+      <div class="nav-group-label">Profile</div>
+      <button class="g-nav-item" id="nav-resume" onclick="go('resume','My Resume')"><span class="nav-icon">📎</span><span class="nav-label">My Resume</span></button>
+    </nav>
+    <div class="g-sidebar-footer">
+      <div class="user-pill">
+        <div class="user-ava" id="g-user-ava">C</div>
+        <div class="user-details">
+          <div class="user-name" id="g-user-name"></div>
+          <div class="user-role" id="g-user-role">Candidate</div>
+        </div>
+      </div>
+      <button onclick="logout()" class="btn-glass btn-danger btn-sm btn-block" style="margin-top:10px">🚪 <span class="nav-label">Sign Out</span></button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="g-main">
+    <div class="g-topbar">
+      <div class="topbar-left"><div class="page-title" id="g-page-title">Dashboard</div></div>
+      <div class="topbar-right">
+        <div class="g-search">
+          <span style="opacity:.4;font-size:14px">🔍</span>
+          <input type="text" placeholder="Search jobs…" id="job-search-input" oninput="filterJobs(this.value)">
+        </div>
+        <div class="btn-icon"><span>🔔</span></div>
+      </div>
+    </div>
+
+    <div class="g-content">
+
+      <!-- ══ DASHBOARD ══ -->
+      <div id="sec-dashboard" class="g-section stagger">
+        <div class="stats-row" id="c-stats-row">
+          <div class="stat-glass"><div class="stat-ico ico-cyan">🔓</div><div class="stat-info"><div class="stat-val" id="s-open">—</div><div class="stat-lbl">Open Jobs</div></div></div>
+          <div class="stat-glass"><div class="stat-ico ico-violet">📄</div><div class="stat-info"><div class="stat-val" id="s-applied">—</div><div class="stat-lbl">Applied</div></div></div>
+          <div class="stat-glass"><div class="stat-ico ico-teal">✅</div><div class="stat-info"><div class="stat-val" id="s-shortlisted">—</div><div class="stat-lbl">Shortlisted</div></div></div>
+          <div class="stat-glass"><div class="stat-ico ico-amber">📊</div><div class="stat-info"><div class="stat-val" id="s-avg">—</div><div class="stat-lbl">Avg Match</div></div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:4px" id="dash-grid">
+          <div class="glass-card">
+            <div style="font-family:var(--font-display);font-weight:700;color:#fff;margin-bottom:16px">Recent Applications</div>
+            <div id="dash-apps-list"></div>
+          </div>
+          <div class="glass-card">
+            <div style="font-family:var(--font-display);font-weight:700;color:#fff;margin-bottom:16px">AI Match Scores</div>
+            <div id="dash-scores-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ BROWSE JOBS ══ -->
+      <div id="sec-browse" class="g-section" style="display:none">
+        <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+          <div style="font-family:var(--font-display);font-weight:700;font-size:18px;color:#fff">Open Positions</div>
+          <div style="display:flex;gap:8px">
+            <select id="filter-type" class="g-select" style="width:140px" onchange="filterJobs()">
+              <option value="">All Types</option>
+              <option>Full-time</option>
+              <option>Part-time</option>
+              <option>Internship</option>
+              <option>Remote</option>
+              <option>Contract</option>
+            </select>
+          </div>
+        </div>
+        <div id="jobs-grid"></div>
+      </div>
+
+      <!-- ══ MY APPLICATIONS ══ -->
+      <div id="sec-applied" class="g-section" style="display:none">
+        <div class="glass-card">
+          <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:16px;margin-bottom:20px">My Applications &amp; AI Rankings</div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead>
+                <tr>
+                  <th>Job Title</th>
+                  <th>TF-IDF Score</th>
+                  <th>BERT Score</th>
+                  <th>Final Score</th>
+                  <th>Match %</th>
+                  <th>Your Rank</th>
+                  <th>Status</th>
+                  <th>Applied</th>
+                </tr>
+              </thead>
+              <tbody id="applied-tbody">
+                <tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(255,255,255,.3)">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MY RESUME ══ -->
+      <div id="sec-resume" class="g-section" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="glass-card">
+            <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:16px;margin-bottom:20px">Upload Resume</div>
+            <div class="upload-zone" id="upload-drop-zone">
+              <div class="upload-icon">📄</div>
+              <h4>Click or drag PDF here</h4>
+              <p>AI will extract your skills automatically</p>
+            </div>
+            <input type="file" id="resume-file-input" accept=".pdf" style="display:none">
+            <div id="selected-file-name" style="margin-top:10px;font-size:13px;color:var(--cyan);display:none"></div>
+            <button class="btn-glass btn-primary btn-block" id="upload-resume-btn" style="margin-top:16px;display:none" onclick="doUploadResume()">📤 Upload &amp; Extract Skills</button>
+          </div>
+          <div class="glass-card">
+            <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:16px;margin-bottom:20px">My Uploaded Resumes</div>
+            <div id="my-resumes-list"></div>
+          </div>
+        </div>
+        <div id="extracted-skills-box" style="margin-top:20px"></div>
+      </div>
+
+    </div><!-- /g-content -->
+  </div><!-- /g-main -->
+</div><!-- /g-layout -->
+
+<!-- ══ APPLY MODAL ══ -->
+<div class="g-modal-overlay" id="apply-modal">
+  <div class="g-modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="apply-modal-title">Apply for Job</div>
+      <button class="modal-close" onclick="closeModal('apply-modal')">×</button>
+    </div>
+
+    <!-- Job info card -->
+    <div id="apply-job-info-box" style="background:var(--glass-1);border:1px solid var(--border-glass);border-radius:12px;padding:16px;margin-bottom:20px"></div>
+
+    <!-- Resume selector -->
+    <div class="g-form-group">
+      <label>Select Your Resume *</label>
+      <select id="modal-resume-select" class="g-select">
+        <option value="">— Select a resume —</option>
+      </select>
+    </div>
+    <div id="no-resume-warning" style="display:none;padding:12px;background:rgba(255,183,3,0.1);border:1px solid rgba(255,183,3,0.3);border-radius:10px;font-size:13px;color:var(--amber);margin-bottom:16px">
+      ⚠️ You have no uploaded resumes. <a href="#" onclick="closeModal('apply-modal');go('resume','My Resume')" style="color:var(--cyan)">Upload one first →</a>
+    </div>
+
+    <!-- Score preview after selecting resume -->
+    <div id="apply-score-preview" style="margin-bottom:16px"></div>
+
+    <input type="hidden" id="apply-hidden-jid">
+    <button class="btn-glass btn-primary btn-block btn-lg" id="apply-submit-btn" onclick="submitApplication()">🚀 Submit Application</button>
+  </div>
+</div>
+
+<script src="/static/js/glass-app.js"></script>
+<script>
+// ─── Guard ────────────────────────────────────────────────────────────────────
+requireAuth('candidate');
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let allOpenJobs   = [];
+let myResumes     = [];
+let myAppliedJids = new Set();
+
+// ─── Section navigation ───────────────────────────────────────────────────────
+function go(secId, label) {
+  showSection(secId, label);
+  const loaders = {
+    dashboard : loadDashboard,
+    browse    : loadBrowse,
+    applied   : loadApplied,
+    resume    : loadResumePage
+  };
+  if (loaders[secId]) loaders[secId]();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const d = await api('GET', '/candidate/dashboard');
+  if (!d.success) return;
+  const s = d.stats;
+  document.getElementById('s-open').textContent       = s.open_jobs;
+  document.getElementById('s-applied').textContent    = s.total_applied;
+  document.getElementById('s-shortlisted').textContent = s.shortlisted;
+  document.getElementById('s-avg').textContent        = s.avg_match + '%';
+
+  // Recent applications
+  const ad = await api('GET', '/candidate/my-applications');
+  const appsDiv = document.getElementById('dash-apps-list');
+  const scoresDiv = document.getElementById('dash-scores-list');
+
+  if (ad.success && ad.applications.length) {
+    appsDiv.innerHTML = ad.applications.slice(0, 5).map(a => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-glass)">
+        <div class="score-ring ${scoreClass(a.match_percentage)}" style="width:46px;height:46px;flex-shrink:0">
+          <div class="score-pct" style="font-size:13px">${a.match_percentage}%</div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.job_title}</div>
+          <div style="display:flex;gap:8px;margin-top:3px;align-items:center">
+            <span class="badge ${a.status==='shortlisted'?'badge-success':a.status==='rejected'?'badge-danger':'badge-warning'}" style="font-size:10px">${a.status}</span>
+            ${a.rank ? `<span style="font-size:11px;color:rgba(255,255,255,.4)">Rank #${a.rank} of ${a.total_applicants}</span>` : ''}
+          </div>
+        </div>
+      </div>`).join('');
+
+    scoresDiv.innerHTML = ad.applications.slice(0, 5).map(a => `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px">
+          <span style="color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${a.job_title}</span>
+          <span style="font-weight:700;color:${a.match_percentage>=70?'var(--teal)':a.match_percentage>=40?'var(--amber)':'#fc8181'};flex-shrink:0;margin-left:8px">${a.match_percentage}%</span>
+        </div>
+        <div class="g-progress">
+          <div class="g-progress-fill ${a.match_percentage>=70?'fill-teal':a.match_percentage>=40?'fill-amber':'fill-red'}" style="width:${a.match_percentage}%"></div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">TF-IDF: ${(a.tfidf_score*100).toFixed(0)}% | BERT: ${(a.bert_score*100).toFixed(0)}%</div>
+      </div>`).join('');
+  } else {
+    appsDiv.innerHTML  = '<div class="g-empty" style="padding:24px"><div class="empty-ico" style="font-size:32px">📄</div><p>No applications yet</p></div>';
+    scoresDiv.innerHTML = '<div class="g-empty" style="padding:24px"><p>Apply to jobs to see AI scores here</p></div>';
+  }
+}
+
+// ─── BROWSE JOBS ──────────────────────────────────────────────────────────────
+async function loadBrowse() {
+  document.getElementById('jobs-grid').innerHTML = '<div class="g-empty"><div class="empty-ico">⏳</div><p>Loading jobs…</p></div>';
+  const [jd, ad] = await Promise.all([
+    api('GET', '/candidate/jobs'),
+    api('GET', '/candidate/my-applications')
+  ]);
+  allOpenJobs   = jd.jobs || [];
+  myAppliedJids = new Set((ad.applications || []).map(a => a.job_id));
+  renderJobs(allOpenJobs);
+}
+
+function filterJobs(q) {
+  const query  = (q || document.getElementById('job-search-input').value || '').toLowerCase();
+  const type   = document.getElementById('filter-type')?.value || '';
+  const filtered = allOpenJobs.filter(j =>
+    (!type || j.job_type === type) &&
+    (!query || j.title.toLowerCase().includes(query) || j.skills_required.toLowerCase().includes(query) || (j.location||'').toLowerCase().includes(query))
+  );
+  renderJobs(filtered);
+}
+
+function renderJobs(jobs) {
+  const grid = document.getElementById('jobs-grid');
+  if (!jobs.length) {
+    grid.innerHTML = '<div class="g-empty"><div class="empty-ico">💼</div><h4>No jobs found</h4><p>Try a different search or filter</p></div>';
+    return;
+  }
+  grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+    ${jobs.map(j => {
+      const applied = myAppliedJids.has(j.id);
+      const skills  = j.skills_required.split(',').slice(0,5).map(s => s.trim()).filter(Boolean);
+      return `
+      <div class="glass-card" style="display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div style="font-size:15px;font-weight:700;color:#fff;line-height:1.3">${j.title}</div>
+          <span class="badge badge-success" style="flex-shrink:0;margin-left:8px">Open</span>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:rgba(255,255,255,.4);margin-bottom:10px">
+          ${j.location ? `<span>📍 ${j.location}</span>` : ''}
+          ${j.job_type ? `<span>⏰ ${j.job_type}</span>` : ''}
+          ${j.experience_required ? `<span>💼 ${j.experience_required}</span>` : ''}
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:12px;flex:1">
+          ${j.description.length > 120 ? j.description.slice(0,120)+'…' : j.description}
+        </div>
+        <div style="margin-bottom:14px">
+          ${skills.map(s => `<span class="badge badge-violet" style="margin:2px 2px 2px 0">${s}</span>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border-glass);padding-top:12px">
+          <span style="font-size:11px;color:rgba(255,255,255,.3)">${j.application_count} applicant${j.application_count !== 1 ? 's' : ''}</span>
+          ${applied
+            ? `<span class="badge badge-success">✅ Applied</span>`
+            : `<button class="btn-glass btn-primary btn-sm" onclick="openApplyModal(${j.id})">Apply Now →</button>`}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ─── MY APPLICATIONS ─────────────────────────────────────────────────────────
+async function loadApplied() {
+  const tbody = document.getElementById('applied-tbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:rgba(255,255,255,.3)">Loading…</td></tr>';
+  const d = await api('GET', '/candidate/my-applications');
+  if (!d.success || !d.applications.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="g-empty"><div class="empty-ico">📄</div>
+      <h4>No applications yet</h4>
+      <p>Browse jobs and apply to see your rankings here</p>
+      <button class="btn-glass btn-primary btn-sm" style="margin-top:12px" onclick="go('browse','Browse Jobs')">Browse Jobs →</button>
+    </div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = d.applications.map(a => {
+    const rankColor = a.rank === 1 ? 'var(--amber)' : a.rank === 2 ? 'rgba(255,255,255,.7)' : a.rank === 3 ? '#cd7f32' : 'rgba(255,255,255,.4)';
+    const rankLabel = a.rank ? `<span style="font-family:var(--font-display);font-weight:800;font-size:16px;color:${rankColor}">${a.rank <= 3 ? ['🥇','🥈','🥉'][a.rank-1] : '#'+a.rank}</span> <span style="font-size:11px;color:rgba(255,255,255,.3)">of ${a.total_applicants}</span>` : '—';
+    return `<tr>
+      <td><b style="color:#fff">${a.job_title}</b></td>
+      <td style="color:var(--cyan)">${(a.tfidf_score*100).toFixed(1)}%</td>
+      <td style="color:#a78bfa">${(a.bert_score*100).toFixed(1)}%</td>
+      <td style="color:var(--amber);font-weight:700">${(a.final_score*100).toFixed(1)}%</td>
+      <td>${scoreBadge(a.match_percentage)}</td>
+      <td>${rankLabel}</td>
+      <td><span class="badge ${a.status==='shortlisted'?'badge-success':a.status==='rejected'?'badge-danger':'badge-warning'}">${a.status}</span></td>
+      <td style="font-size:11px;color:rgba(255,255,255,.35)">${a.applied_at}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── RESUME PAGE ──────────────────────────────────────────────────────────────
+async function loadResumePage() {
+  const d = await api('GET', '/candidate/my-resumes');
+  myResumes = d.resumes || [];
+  renderResumeList();
+  // Setup file picker
+  const input = document.getElementById('resume-file-input');
+  const zone  = document.getElementById('upload-drop-zone');
+  zone.onclick = () => input.click();
+  input.onchange = () => {
+    const f = input.files[0];
+    if (!f) return;
+    document.getElementById('selected-file-name').textContent = '📄 ' + f.name;
+    document.getElementById('selected-file-name').style.display = 'block';
+    document.getElementById('upload-resume-btn').style.display = 'flex';
+  };
+  zone.ondragover = e => { e.preventDefault(); zone.classList.add('dragover'); };
+  zone.ondragleave = () => zone.classList.remove('dragover');
+  zone.ondrop = e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (!f || !f.name.toLowerCase().endsWith('.pdf')) { toast('Only PDF files allowed', 'error'); return; }
+    const dt = new DataTransfer(); dt.items.add(f); input.files = dt.files;
+    document.getElementById('selected-file-name').textContent = '📄 ' + f.name;
+    document.getElementById('selected-file-name').style.display = 'block';
+    document.getElementById('upload-resume-btn').style.display = 'flex';
+  };
+}
+
+function renderResumeList() {
+  const div = document.getElementById('my-resumes-list');
+  if (!myResumes.length) {
+    div.innerHTML = '<div class="g-empty" style="padding:24px"><div class="empty-ico" style="font-size:32px">📄</div><p>No resumes uploaded yet</p></div>';
+    return;
+  }
+  div.innerHTML = myResumes.map((r, i) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--glass-1);border:1px solid var(--border-glass);border-radius:10px;margin-bottom:8px">
+      <span style="font-size:24px">📄</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.filename}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px">${r.uploaded_at}</div>
+      </div>
+      ${i === 0 ? '<span class="badge badge-success">Latest</span>' : '<span class="badge badge-gray">Saved</span>'}
+    </div>`).join('');
+}
+
+async function doUploadResume() {
+  const input = document.getElementById('resume-file-input');
+  const file  = input.files[0];
+  if (!file) { toast('Please select a PDF file', 'error'); return; }
+  if (!file.name.toLowerCase().endsWith('.pdf')) { toast('Only PDF files allowed', 'error'); return; }
+
+  const btn = document.getElementById('upload-resume-btn');
+  btn.disabled = true; btn.textContent = '⏳ Uploading & Extracting…';
+
+  const fd = new FormData();
+  fd.append('resume', file);
+
+  const d = await api('POST', '/candidate/upload-resume', fd, true);
+  btn.disabled = false; btn.textContent = '📤 Upload & Extract Skills';
+
+  if (d.success) {
+    toast('Resume uploaded! Skills extracted by AI ✅', 'success');
+    myResumes = [d.resume, ...myResumes];
+    renderResumeList();
+    // Reset
+    input.value = '';
+    document.getElementById('selected-file-name').style.display = 'none';
+    btn.style.display = 'none';
+    // Show skills
+    if (d.extracted_skills && d.extracted_skills.length) {
+      document.getElementById('extracted-skills-box').innerHTML = `
+        <div class="glass-card">
+          <div style="font-family:var(--font-display);font-weight:700;color:#fff;margin-bottom:14px">🎯 Skills Detected by AI</div>
+          <div>${d.extracted_skills.map(s => `<span class="badge badge-violet" style="margin:3px">${s}</span>`).join('')}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:12px">These skills will be used for AI scoring when you apply to jobs</div>
+        </div>`;
+    }
+  } else {
+    toast(d.message || 'Upload failed — try again', 'error');
+  }
+}
+
+// ─── APPLY MODAL ─────────────────────────────────────────────────────────────
+async function openApplyModal(jid) {
+  // Find job
+  const job = allOpenJobs.find(j => j.id === jid);
+  if (!job) { toast('Job not found', 'error'); return; }
+
+  // Set job info
+  document.getElementById('apply-modal-title').textContent = 'Apply: ' + job.title;
+  document.getElementById('apply-hidden-jid').value = jid;
+  document.getElementById('apply-score-preview').innerHTML = '';
+
+  const skills = job.skills_required.split(',').slice(0, 6).map(s => s.trim()).filter(Boolean);
+  document.getElementById('apply-job-info-box').innerHTML = `
+    <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:8px">${job.title}</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:10px">
+      ${[job.location, job.job_type, job.experience_required].filter(Boolean).join(' • ')}
+    </div>
+    <div>${skills.map(s => `<span class="badge badge-violet" style="margin:2px">${s}</span>`).join('')}</div>`;
+
+  // Load latest resumes
+  const rd = await api('GET', '/candidate/my-resumes');
+  myResumes = rd.resumes || [];
+
+  const sel = document.getElementById('modal-resume-select');
+  const warn = document.getElementById('no-resume-warning');
+  const submitBtn = document.getElementById('apply-submit-btn');
+
+  if (!myResumes.length) {
+    sel.innerHTML = '<option value="">No resumes found</option>';
+    warn.style.display = 'block';
+    submitBtn.disabled = true;
+  } else {
+    warn.style.display = 'none';
+    submitBtn.disabled = false;
+    sel.innerHTML = '<option value="">— Select a resume —</option>' +
+      myResumes.map(r => `<option value="${r.id}">${r.filename} (${r.uploaded_at})</option>`).join('');
+  }
+
+  openModal('apply-modal');
+}
+
+async function submitApplication() {
+  const jid = parseInt(document.getElementById('apply-hidden-jid').value);
+  const rid = parseInt(document.getElementById('modal-resume-select').value);
+
+  if (!jid) { toast('Job not found', 'error'); return; }
+  if (!rid) { toast('Please select a resume first', 'error'); return; }
+
+  const btn = document.getElementById('apply-submit-btn');
+  btn.disabled = true; btn.textContent = '⏳ AI is scoring your resume…';
+
+  const d = await api('POST', `/candidate/apply/${jid}`, { resume_id: rid });
+
+  btn.disabled = false; btn.textContent = '🚀 Submit Application';
+
+  if (d.success) {
+    // Show score in modal
+    const s = d.scores;
+    document.getElementById('apply-score-preview').innerHTML = `
+      <div style="background:var(--glass-1);border:1px solid var(--border-glass);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:12px">🤖 AI Score Results</div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div class="score-ring ${scoreClass(s.match_percentage)}">
+            <div class="score-pct">${s.match_percentage}%</div>
+            <div class="score-lbl">Match</div>
+          </div>
+          <div>
+            <div style="font-size:13px;margin-bottom:6px"><span style="color:rgba(255,255,255,.5)">TF-IDF:</span> <span style="color:var(--cyan)">${(s.tfidf_score*100).toFixed(1)}%</span> <span style="font-size:11px;color:rgba(255,255,255,.3)">(40% weight)</span></div>
+            <div style="font-size:13px;margin-bottom:6px"><span style="color:rgba(255,255,255,.5)">BERT:</span> <span style="color:#a78bfa">${(s.bert_score*100).toFixed(1)}%</span> <span style="font-size:11px;color:rgba(255,255,255,.3)">(60% weight)</span></div>
+            <div style="font-size:13px"><span style="color:rgba(255,255,255,.5)">Status:</span> <span class="badge ${d.status==='shortlisted'?'badge-success':'badge-warning'}">${d.status}</span></div>
+          </div>
+        </div>
+      </div>`;
+    toast(d.message, 'success');
+    myAppliedJids.add(jid);
+    // Update button to close
+    btn.textContent = '✅ Applied! Close';
+    btn.onclick = () => { closeModal('apply-modal'); renderJobs(allOpenJobs); btn.onclick = submitApplication; };
+  } else {
+    toast(d.message || 'Application failed — please try again', 'error');
+  }
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+loadDashboard();
+</script>
+</body>
+</html>

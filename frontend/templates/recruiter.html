@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recruiter — Smart AI Recruitment</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/glass.css">
+</head>
+<body>
+<div class="g-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="g-sidebar">
+    <div class="brand">
+      <div class="brand-icon">🤖</div>
+      <div class="brand-text">SmartRecruit<span style="color:var(--cyan)">AI</span></div>
+    </div>
+    <nav class="g-nav">
+      <div class="nav-group-label">Overview</div>
+      <button class="g-nav-item active" id="nav-dashboard" onclick="go('dashboard','Dashboard')"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
+      <div class="nav-group-label">Jobs</div>
+      <button class="g-nav-item" id="nav-jobs" onclick="go('jobs','My Jobs')"><span class="nav-icon">💼</span><span class="nav-label">My Jobs</span></button>
+      <button class="g-nav-item" id="nav-postjob" onclick="go('postjob','Post New Job')"><span class="nav-icon">➕</span><span class="nav-label">Post Job</span></button>
+      <div class="nav-group-label">AI Screening</div>
+      <button class="g-nav-item" id="nav-screen" onclick="go('screen','AI Screening')"><span class="nav-icon">🎯</span><span class="nav-label">AI Screening</span></button>
+      <button class="g-nav-item" id="nav-results" onclick="go('results','Rankings')"><span class="nav-icon">🏆</span><span class="nav-label">Rankings</span></button>
+    </nav>
+    <div class="g-sidebar-footer">
+      <div class="user-pill">
+        <div class="user-ava" id="g-user-ava">R</div>
+        <div class="user-details">
+          <div class="user-name" id="g-user-name"></div>
+          <div class="user-role" id="g-user-role">Recruiter</div>
+        </div>
+      </div>
+      <button onclick="logout()" class="btn-glass btn-danger btn-sm btn-block" style="margin-top:10px">🚪 <span class="nav-label">Sign Out</span></button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="g-main">
+    <div class="g-topbar">
+      <div class="topbar-left"><div class="page-title" id="g-page-title">Dashboard</div></div>
+      <div class="topbar-right">
+        <div class="g-search"><span style="opacity:.4;font-size:14px">🔍</span><input type="text" placeholder="Search…"></div>
+        <div class="btn-icon"><span>🔔</span></div>
+      </div>
+    </div>
+
+    <div class="g-content">
+
+      <!-- ══ DASHBOARD ══ -->
+      <div id="sec-dashboard" class="g-section stagger">
+        <div class="stats-row" id="r-stats-row">
+          <div class="stat-glass"><div class="stat-ico ico-cyan">💼</div><div class="stat-info"><div class="stat-val" id="rs-jobs">—</div><div class="stat-lbl">Total Jobs</div></div></div>
+          <div class="stat-glass"><div class="stat-ico ico-violet">🔓</div><div class="stat-info"><div class="stat-val" id="rs-open">—</div><div class="stat-lbl">Open Jobs</div></div></div>
+          <div class="stat-glass"><div class="stat-ico ico-teal">📄</div><div class="stat-info"><div class="stat-val" id="rs-apps">—</div><div class="stat-lbl">Applications</div></div></div>
+          <div class="stat-glass"><div class="stat-ico ico-amber">✅</div><div class="stat-info"><div class="stat-val" id="rs-short">—</div><div class="stat-lbl">Shortlisted</div></div></div>
+        </div>
+        <div class="glass-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <div style="font-family:var(--font-display);font-weight:700;color:#fff">My Jobs Overview</div>
+            <button class="btn-glass btn-primary btn-sm" onclick="go('postjob','Post New Job')">➕ Post Job</button>
+          </div>
+          <div id="dash-jobs-preview"></div>
+        </div>
+      </div>
+
+      <!-- ══ MY JOBS ══ -->
+      <div id="sec-jobs" class="g-section" style="display:none">
+        <div class="glass-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:16px">My Job Postings</div>
+            <button class="btn-glass btn-primary btn-sm" onclick="go('postjob','Post New Job')">➕ New Job</button>
+          </div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>Title</th><th>Type</th><th>Location</th><th>Experience</th><th>Status</th><th>Applicants</th><th>Actions</th></tr></thead>
+              <tbody id="jobs-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:rgba(255,255,255,.3)">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ POST JOB ══ -->
+      <div id="sec-postjob" class="g-section" style="display:none">
+        <div class="glass-card" style="max-width:720px">
+          <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:18px;margin-bottom:24px">Post a New Job</div>
+          <div class="form-row-2">
+            <div class="g-form-group"><label>Job Title *</label><input type="text" id="j-title" class="g-input" placeholder="e.g. Python Developer"></div>
+            <div class="g-form-group"><label>Job Type</label>
+              <select id="j-type" class="g-select">
+                <option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="g-form-group"><label>Location</label><input type="text" id="j-location" class="g-input" placeholder="e.g. Bangalore / Remote"></div>
+            <div class="g-form-group"><label>Experience Required</label><input type="text" id="j-exp" class="g-input" placeholder="e.g. 2-4 years"></div>
+          </div>
+          <div class="g-form-group">
+            <label>Job Description *</label>
+            <textarea id="j-desc" class="g-textarea" placeholder="Describe the role, responsibilities, tech stack, team, and what you're looking for…"></textarea>
+          </div>
+          <div class="g-form-group">
+            <label>Skills Required * <span style="color:rgba(255,255,255,.3);font-size:11px;letter-spacing:0;text-transform:none;font-weight:400">(comma separated — used by AI for scoring)</span></label>
+            <textarea id="j-skills" class="g-textarea" style="min-height:70px" placeholder="e.g. Python, Machine Learning, NLP, Flask, REST API, TensorFlow, Git…"></textarea>
+          </div>
+          <button class="btn-glass btn-primary btn-lg" id="post-job-btn" onclick="postJob()">🚀 Post Job</button>
+        </div>
+      </div>
+
+      <!-- ══ AI SCREENING ══ -->
+      <div id="sec-screen" class="g-section" style="display:none">
+        <div class="glass-card" style="margin-bottom:20px">
+          <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:16px;margin-bottom:20px">🎯 Bulk Resume Upload &amp; AI Screening</div>
+
+          <div class="form-row-2">
+            <div class="g-form-group">
+              <label>Select Job *</label>
+              <select id="screen-job-sel" class="g-select" onchange="onScreenJobChange()">
+                <option value="">— Select a job —</option>
+              </select>
+            </div>
+            <div class="g-form-group">
+              <label>Shortlist Threshold (%)</label>
+              <input type="number" id="screen-threshold" class="g-input" value="50" min="10" max="95">
+              <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:4px">Candidates above this % will be shortlisted</div>
+            </div>
+          </div>
+
+          <div id="screen-upload-area" style="display:none">
+            <div class="upload-zone" id="screen-drop-zone">
+              <div class="upload-icon">📁</div>
+              <h4>Click or drag PDF resumes here</h4>
+              <p>Multiple files supported • AI scores each one automatically</p>
+            </div>
+            <input type="file" id="screen-file-input" multiple accept=".pdf" style="display:none">
+            <div id="screen-file-list" style="margin-top:12px"></div>
+            <button class="btn-glass btn-primary btn-lg" id="screen-upload-btn" style="margin-top:16px;display:none" onclick="runAIScreening()">🤖 Upload &amp; Run AI Screening</button>
+          </div>
+        </div>
+        <div id="screen-results-box"></div>
+      </div>
+
+      <!-- ══ RANKINGS ══ -->
+      <div id="sec-results" class="g-section" style="display:none">
+        <div class="glass-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+            <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:16px">🏆 AI Candidate Rankings</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+              <select id="results-job-sel" class="g-select" style="min-width:220px" onchange="loadRankings()">
+                <option value="">— Select Job —</option>
+              </select>
+              <button class="btn-glass btn-success btn-sm" onclick="reShortlist()">🔄 Re-Rank</button>
+              <button class="btn-glass btn-primary btn-sm" onclick="downloadZip()">⬇ Download Shortlist</button>
+            </div>
+          </div>
+
+          <!-- Score formula legend -->
+          <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:rgba(255,255,255,.6)">
+            <b style="color:var(--cyan)">AI Scoring Formula:</b> Final Score = <span style="color:var(--cyan)">(TF-IDF × 40%)</span> + <span style="color:#a78bfa">(BERT × 60%)</span> | Shortlisted if Match ≥ 50%
+          </div>
+
+          <div id="rankings-content">
+            <div class="g-empty"><div class="empty-ico">🏆</div><h4>Select a job to view AI rankings</h4></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /g-content -->
+  </div><!-- /g-main -->
+</div><!-- /g-layout -->
+
+<!-- Edit Job Modal -->
+<div class="g-modal-overlay" id="edit-modal">
+  <div class="g-modal">
+    <div class="modal-hdr"><div class="modal-title">Edit Job</div><button class="modal-close" onclick="closeModal('edit-modal')">×</button></div>
+    <input type="hidden" id="edit-jid">
+    <div class="form-row-2">
+      <div class="g-form-group"><label>Title</label><input type="text" id="edit-title" class="g-input"></div>
+      <div class="g-form-group"><label>Type</label>
+        <select id="edit-type" class="g-select"><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option></select>
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="g-form-group"><label>Location</label><input type="text" id="edit-location" class="g-input"></div>
+      <div class="g-form-group"><label>Status</label>
+        <select id="edit-status" class="g-select"><option value="open">Open</option><option value="closed">Closed</option></select>
+      </div>
+    </div>
+    <div class="g-form-group"><label>Experience</label><input type="text" id="edit-exp" class="g-input"></div>
+    <div class="g-form-group"><label>Description</label><textarea id="edit-desc" class="g-textarea"></textarea></div>
+    <div class="g-form-group"><label>Skills Required</label><textarea id="edit-skills" class="g-textarea" style="min-height:70px"></textarea></div>
+    <button class="btn-glass btn-primary btn-block" onclick="saveJob()">Save Changes →</button>
+  </div>
+</div>
+
+<script src="/static/js/glass-app.js"></script>
+<script>
+requireAuth('recruiter');
+let allMyJobs = [];
+
+function go(secId, label) {
+  showSection(secId, label);
+  const loaders = {
+    dashboard : loadDashboard,
+    jobs      : loadJobs,
+    postjob   : () => {},
+    screen    : loadScreenSection,
+    results   : loadResultsSection
+  };
+  if (loaders[secId]) loaders[secId]();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const d = await api('GET', '/recruiter/dashboard');
+  if (!d.success) return;
+  const s = d.stats;
+  document.getElementById('rs-jobs').textContent  = s.total_jobs;
+  document.getElementById('rs-open').textContent  = s.open_jobs;
+  document.getElementById('rs-apps').textContent  = s.total_applications;
+  document.getElementById('rs-short').textContent = s.shortlisted;
+
+  const jd = await api('GET', '/recruiter/jobs');
+  allMyJobs = jd.jobs || [];
+  const div = document.getElementById('dash-jobs-preview');
+  if (!allMyJobs.length) {
+    div.innerHTML = '<div class="g-empty"><div class="empty-ico">💼</div><h4>No jobs posted yet</h4><p>Post your first job to start receiving applications</p></div>';
+    return;
+  }
+  div.innerHTML = `<div class="g-table-wrap"><table class="g-table">
+    <thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Applicants</th><th>Action</th></tr></thead>
+    <tbody>${allMyJobs.slice(0,5).map(j => `<tr>
+      <td><b style="color:#fff">${j.title}</b></td>
+      <td style="color:rgba(255,255,255,.5);font-size:12px">${j.job_type}</td>
+      <td><span class="badge ${j.status==='open'?'badge-success':'badge-gray'}">${j.status}</span></td>
+      <td><span class="badge badge-info">${j.application_count}</span></td>
+      <td><button class="btn-glass btn-sm" onclick="goToRankings(${j.id})">View Rankings →</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ─── MY JOBS ─────────────────────────────────────────────────────────────────
+async function loadJobs() {
+  const d = await api('GET', '/recruiter/jobs');
+  allMyJobs = d.jobs || [];
+  const tbody = document.getElementById('jobs-tbody');
+  if (!allMyJobs.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="g-empty"><div class="empty-ico">💼</div><h4>No jobs yet</h4></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = allMyJobs.map(j => `<tr>
+    <td><b style="color:#fff">${j.title}</b></td>
+    <td style="font-size:12px;color:rgba(255,255,255,.5)">${j.job_type}</td>
+    <td style="font-size:12px;color:rgba(255,255,255,.5)">${j.location || '—'}</td>
+    <td style="font-size:12px;color:rgba(255,255,255,.5)">${j.experience_required || '—'}</td>
+    <td><span class="badge ${j.status==='open'?'badge-success':'badge-gray'}">${j.status}</span></td>
+    <td><span class="badge badge-info">${j.application_count}</span></td>
+    <td><div style="display:flex;gap:6px">
+      <button class="btn-glass btn-sm" onclick="openEditModal(${j.id})">✏️ Edit</button>
+      <button class="btn-glass btn-sm" onclick="goToRankings(${j.id})">🏆 Rank</button>
+      <button class="btn-glass btn-danger btn-sm" onclick="deleteJob(${j.id})">🗑</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+// ─── POST JOB ────────────────────────────────────────────────────────────────
+async function postJob() {
+  const title  = document.getElementById('j-title').value.trim();
+  const desc   = document.getElementById('j-desc').value.trim();
+  const skills = document.getElementById('j-skills').value.trim();
+  if (!title || !desc || !skills) { toast('Title, description and skills are required', 'error'); return; }
+
+  const btn = document.getElementById('post-job-btn');
+  btn.disabled = true; btn.textContent = '⏳ Posting…';
+  const d = await api('POST', '/recruiter/jobs', {
+    title, description: desc, skills_required: skills,
+    experience_required: document.getElementById('j-exp').value,
+    location: document.getElementById('j-location').value,
+    job_type: document.getElementById('j-type').value
+  });
+  btn.disabled = false; btn.textContent = '🚀 Post Job';
+  if (d.success) {
+    toast('Job posted successfully! 🎉', 'success');
+    ['j-title','j-desc','j-skills','j-exp','j-location'].forEach(id => document.getElementById(id).value = '');
+    setTimeout(() => go('jobs', 'My Jobs'), 700);
+  } else {
+    toast(d.message || 'Failed to post job', 'error');
+  }
+}
+
+// ─── AI SCREENING ─────────────────────────────────────────────────────────────
+async function loadScreenSection() {
+  const d = await api('GET', '/recruiter/jobs');
+  const sel = document.getElementById('screen-job-sel');
+  const openJobs = (d.jobs || []).filter(j => j.status === 'open');
+  sel.innerHTML = '<option value="">— Select a job —</option>' +
+    openJobs.map(j => `<option value="${j.id}">${j.title}</option>`).join('');
+}
+
+function onScreenJobChange() {
+  const val = document.getElementById('screen-job-sel').value;
+  document.getElementById('screen-upload-area').style.display = val ? 'block' : 'none';
+  document.getElementById('screen-results-box').innerHTML = '';
+  screenFiles = [];
+  document.getElementById('screen-file-list').innerHTML = '';
+  document.getElementById('screen-upload-btn').style.display = 'none';
+}
+
+let screenFiles = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  const zone  = document.getElementById('screen-drop-zone');
+  const input = document.getElementById('screen-file-input');
+  if (!zone || !input) return;
+  zone.onclick  = () => input.click();
+  zone.ondragover  = e => { e.preventDefault(); zone.classList.add('dragover'); };
+  zone.ondragleave = () => zone.classList.remove('dragover');
+  zone.ondrop = e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    handleScreenFiles(e.dataTransfer.files);
+  };
+  input.onchange = () => handleScreenFiles(input.files);
+});
+
+function handleScreenFiles(files) {
+  screenFiles = [...files].filter(f => f.name.toLowerCase().endsWith('.pdf'));
+  if (!screenFiles.length) { toast('Only PDF files allowed', 'error'); return; }
+  document.getElementById('screen-file-list').innerHTML = screenFiles.map(f =>
+    `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--glass-1);border:1px solid var(--border-glass);border-radius:8px;margin-bottom:6px;font-size:13px">
+      <span>📄</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(255,255,255,.8)">${f.name}</span>
+      <span class="badge badge-violet">${(f.size/1024).toFixed(0)} KB</span>
+    </div>`
+  ).join('');
+  document.getElementById('screen-upload-btn').style.display = 'inline-flex';
+}
+
+async function runAIScreening() {
+  const jid = document.getElementById('screen-job-sel').value;
+  if (!jid)          { toast('Please select a job', 'error'); return; }
+  if (!screenFiles.length) { toast('Please upload PDF resumes', 'error'); return; }
+
+  const btn = document.getElementById('screen-upload-btn');
+  btn.disabled = true; btn.textContent = '🤖 AI is processing resumes…';
+
+  const fd = new FormData();
+  screenFiles.forEach(f => fd.append('resumes', f));
+
+  const d = await api('POST', `/recruiter/jobs/${jid}/upload-resumes`, fd, true);
+  btn.disabled = false; btn.textContent = '🤖 Upload & Run AI Screening';
+
+  if (d.success) {
+    toast(`${d.total} resumes scored by AI! 🎉`, 'success');
+    // Show results table
+    const sorted = [...d.results].sort((a,b) => b.match_percentage - a.match_percentage);
+    document.getElementById('screen-results-box').innerHTML = `
+      <div class="glass-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-family:var(--font-display);font-weight:700;color:#fff">AI Scoring Results — ${sorted.length} Resumes</div>
+          <button class="btn-glass btn-primary btn-sm" onclick="goToRankings(${jid})">Full Rankings →</button>
+        </div>
+        <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:rgba(255,255,255,.6)">
+          Formula: Final = (TF-IDF × 40%) + (BERT × 60%) &nbsp;|&nbsp; Threshold: ${document.getElementById('screen-threshold').value}% for shortlisting
+        </div>
+        <div class="g-table-wrap">
+          <table class="g-table">
+            <thead><tr><th>Rank</th><th>Resume</th><th>TF-IDF</th><th>BERT</th><th>Final Score</th><th>Match %</th></tr></thead>
+            <tbody>${sorted.map((r, i) => `<tr style="${i<3?'background:rgba(0,229,255,.03)':''}">
+              <td style="font-family:var(--font-display);font-weight:800;font-size:16px;color:${i===0?'var(--amber)':i===1?'rgba(255,255,255,.6)':i===2?'#cd7f32':'rgba(255,255,255,.35)'}">
+                ${i < 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}
+              </td>
+              <td><b style="color:#fff">${r.filename}</b></td>
+              <td style="color:var(--cyan)">${(r.tfidf_score*100).toFixed(1)}%</td>
+              <td style="color:#a78bfa">${(r.bert_score*100).toFixed(1)}%</td>
+              <td style="color:var(--amber);font-weight:700">${(r.final_score*100).toFixed(1)}%</td>
+              <td>${scoreBadge(r.match_percentage)}</td>
+            </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    screenFiles = [];
+    document.getElementById('screen-file-list').innerHTML = '';
+    btn.style.display = 'none';
+  } else {
+    toast(d.message || 'Screening failed — try again', 'error');
+  }
+}
+
+// ─── RANKINGS ─────────────────────────────────────────────────────────────────
+async function loadResultsSection() {
+  const d = await api('GET', '/recruiter/jobs');
+  const sel = document.getElementById('results-job-sel');
+  sel.innerHTML = '<option value="">— Select Job —</option>' +
+    (d.jobs || []).map(j => `<option value="${j.id}">${j.title} (${j.application_count} applicants)</option>`).join('');
+}
+
+function goToRankings(jid) {
+  go('results', 'Rankings');
+  setTimeout(async () => {
+    await loadResultsSection();
+    document.getElementById('results-job-sel').value = jid;
+    loadRankings();
+  }, 100);
+}
+
+async function loadRankings() {
+  const jid = document.getElementById('results-job-sel').value;
+  const div  = document.getElementById('rankings-content');
+  if (!jid) { div.innerHTML = '<div class="g-empty"><div class="empty-ico">🏆</div><h4>Select a job to view rankings</h4></div>'; return; }
+
+  div.innerHTML = '<div class="g-empty"><div class="empty-ico">⏳</div><p>Loading rankings…</p></div>';
+  const d = await api('GET', `/recruiter/jobs/${jid}/results`);
+
+  if (!d.success || !d.applications.length) {
+    div.innerHTML = `<div class="g-empty"><div class="empty-ico">📄</div><h4>No applications yet</h4>
+      <p>Upload resumes in AI Screening to see rankings here</p>
+      <button class="btn-glass btn-primary btn-sm" style="margin-top:12px" onclick="go('screen','AI Screening')">Go to AI Screening →</button>
+    </div>`;
+    return;
+  }
+
+  const shortlisted = d.applications.filter(a => a.status === 'shortlisted').length;
+  const avgScore    = (d.applications.reduce((s,a) => s+a.match_percentage,0) / d.applications.length).toFixed(1);
+
+  div.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px">
+      <div style="background:var(--glass-1);border:1px solid var(--border-glass);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:#fff">${d.applications.length}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Total Applicants</div>
+      </div>
+      <div style="background:rgba(6,214,160,.08);border:1px solid rgba(6,214,160,.2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:var(--teal)">${shortlisted}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Shortlisted</div>
+      </div>
+      <div style="background:rgba(255,183,3,.08);border:1px solid rgba(255,183,3,.2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:var(--amber)">${avgScore}%</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Avg Match</div>
+      </div>
+      <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:#fc8181">${d.applications.length - shortlisted}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Below Threshold</div>
+      </div>
+    </div>
+
+    <div class="g-table-wrap">
+      <table class="g-table">
+        <thead><tr><th>Rank</th><th>Candidate</th><th>Resume</th><th>TF-IDF (40%)</th><th>BERT (60%)</th><th>Final Score</th><th>Match %</th><th>Status</th></tr></thead>
+        <tbody>
+        ${d.applications.map((a, i) => `<tr style="${i<3?'background:rgba(0,229,255,.025)':''}">
+          <td>
+            <span style="font-family:var(--font-display);font-weight:800;font-size:18px;color:${i===0?'var(--amber)':i===1?'rgba(255,255,255,.7)':i===2?'#cd7f32':'rgba(255,255,255,.3)'}">
+              ${i < 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}
+            </span>
+          </td>
+          <td>
+            <b style="color:#fff">${a.candidate_name}</b>
+            <div style="font-size:11px;color:rgba(255,255,255,.35)">${a.candidate_email}</div>
+          </td>
+          <td style="font-size:12px;color:rgba(255,255,255,.5)">${a.resume_filename}</td>
+          <td>
+            <span style="color:var(--cyan);font-weight:600">${(a.tfidf_score*100).toFixed(1)}%</span>
+            <div class="g-progress" style="margin-top:4px;width:80px"><div class="g-progress-fill fill-cyan" style="width:${a.tfidf_score*100}%"></div></div>
+          </td>
+          <td>
+            <span style="color:#a78bfa;font-weight:600">${(a.bert_score*100).toFixed(1)}%</span>
+            <div class="g-progress" style="margin-top:4px;width:80px"><div class="g-progress-fill fill-violet" style="width:${a.bert_score*100}%"></div></div>
+          </td>
+          <td style="color:var(--amber);font-weight:700;font-size:15px">${(a.final_score*100).toFixed(1)}%</td>
+          <td>${scoreBadge(a.match_percentage)}</td>
+          <td><span class="badge ${a.status==='shortlisted'?'badge-success':a.status==='rejected'?'badge-danger':'badge-warning'}">${a.status}</span></td>
+        </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function reShortlist() {
+  const jid       = document.getElementById('results-job-sel').value;
+  const threshold = prompt('Enter shortlist threshold % (default 50):', '50');
+  if (!jid || threshold === null) return;
+  const d = await api('POST', `/recruiter/jobs/${jid}/shortlist`, { threshold: parseFloat(threshold) });
+  if (d.success) { toast(`Re-ranked: ${d.shortlisted} shortlisted out of ${d.total}`, 'success'); loadRankings(); }
+  else toast(d.message || 'Failed', 'error');
+}
+
+async function downloadZip() {
+  const jid = document.getElementById('results-job-sel').value;
+  if (!jid) { toast('Select a job first', 'error'); return; }
+  toast('Preparing ZIP of shortlisted resumes…', 'info');
+  window.location.href = `/api/recruiter/jobs/${jid}/download-shortlist`;
+}
+
+// ─── Edit Job ─────────────────────────────────────────────────────────────────
+function openEditModal(jid) {
+  const j = allMyJobs.find(j => j.id === jid);
+  if (!j) return;
+  document.getElementById('edit-jid').value      = jid;
+  document.getElementById('edit-title').value    = j.title;
+  document.getElementById('edit-location').value = j.location || '';
+  document.getElementById('edit-exp').value      = j.experience_required || '';
+  document.getElementById('edit-desc').value     = j.description;
+  document.getElementById('edit-skills').value   = j.skills_required;
+  document.getElementById('edit-status').value   = j.status;
+  openModal('edit-modal');
+}
+
+async function saveJob() {
+  const jid = document.getElementById('edit-jid').value;
+  const d = await api('PUT', `/recruiter/jobs/${jid}`, {
+    title: document.getElementById('edit-title').value,
+    description: document.getElementById('edit-desc').value,
+    skills_required: document.getElementById('edit-skills').value,
+    location: document.getElementById('edit-location').value,
+    experience_required: document.getElementById('edit-exp').value,
+    job_type: document.getElementById('edit-type').value,
+    status: document.getElementById('edit-status').value
+  });
+  closeModal('edit-modal');
+  toast(d.message || 'Updated', d.success ? 'success' : 'error');
+  if (d.success) loadJobs();
+}
+
+async function deleteJob(jid) {
+  if (!confirm('Delete this job and all its applications?')) return;
+  const d = await api('DELETE', `/recruiter/jobs/${jid}`);
+  toast(d.message, d.success ? 'success' : 'error');
+  if (d.success) loadJobs();
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+loadDashboard();
+</script>
+</body>
+</html>

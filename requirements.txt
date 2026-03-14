@@ -1,0 +1,14 @@
+flask
+flask_sqlalchemy
+flask_jwt_extended
+flask_mail
+flask_cors
+gunicorn
+scikit-learn
+sentence-transformers
+pdfplumber
+PyPDF2
+requests
+uvicorn
+fastapi
+psycopg2-binary

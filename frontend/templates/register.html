@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Register — Smart AI Recruitment</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/glass.css">
+</head>
+<body>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="g-auth-page">
+  <div class="g-auth-box stagger" style="max-width:480px;width:100%">
+    <div class="auth-logo"><div class="auth-logo-icon">🤖</div><span class="auth-logo-name">SmartRecruit AI</span></div>
+    <div class="auth-title">Create Account</div>
+    <div class="auth-sub">Join thousands of recruiters &amp; candidates</div>
+
+    <div class="role-selector mb-20">
+      <div class="role-opt selected" id="role-candidate" onclick="selectRole('candidate')">
+        <div class="role-ico">👤</div>
+        <div class="role-name">Candidate</div>
+        <div class="role-desc">Looking for jobs</div>
+      </div>
+      <div class="role-opt" id="role-recruiter" onclick="selectRole('recruiter')">
+        <div class="role-ico">🏢</div>
+        <div class="role-name">Recruiter</div>
+        <div class="role-desc">Hiring talent</div>
+      </div>
+    </div>
+
+    <div class="g-form-group"><label>Full Name</label><input type="text" id="name" class="g-input" placeholder="Your full name"></div>
+    <div class="g-form-group"><label>Email Address</label><input type="email" id="email" class="g-input" placeholder="you@example.com"></div>
+    <div class="form-row-2">
+      <div class="g-form-group"><label>Password</label><input type="password" id="password" class="g-input" placeholder="Min 6 chars" oninput="checkStrength()"></div>
+      <div class="g-form-group"><label>Confirm Password</label><input type="password" id="confirm" class="g-input" placeholder="Repeat password"></div>
+    </div>
+    <div id="strength-bar" style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin:-12px 0 16px;overflow:hidden"><div id="strength-fill" style="height:100%;width:0;transition:all .3s;border-radius:2px"></div></div>
+
+    <button class="btn-glass btn-primary btn-block btn-lg" id="reg-btn" onclick="doRegister()">Create Account →</button>
+    <div class="auth-link">Already have an account? <a href="/login">Sign in</a></div>
+  </div>
+</div>
+<script src="/static/js/glass-app.js"></script>
+<script>
+let selRole = 'candidate';
+function selectRole(r){
+  selRole=r;
+  document.querySelectorAll('.role-opt').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('role-'+r).classList.add('selected');
+}
+function checkStrength(){
+  const v=document.getElementById('password').value;
+  const fill=document.getElementById('strength-fill');
+  if(v.length>=8&&/[A-Z]/.test(v)&&/[0-9]/.test(v)){fill.style.width='100%';fill.style.background='var(--teal)';}
+  else if(v.length>=6){fill.style.width='60%';fill.style.background='var(--amber)';}
+  else if(v.length>0){fill.style.width='30%';fill.style.background='#ef4444';}
+  else{fill.style.width='0';}
+}
+async function doRegister(){
+  const btn=document.getElementById('reg-btn');
+  const name=document.getElementById('name').value.trim(),email=document.getElementById('email').value.trim(),password=document.getElementById('password').value,confirm=document.getElementById('confirm').value;
+  if(!name||!email||!password){toast('All fields required','error');return;}
+  if(password!==confirm){toast('Passwords do not match','error');return;}
+  if(password.length<6){toast('Password too short','error');return;}
+  btn.disabled=true;btn.textContent='Creating account…';
+  const d=await api('POST','/auth/register',{name,email,password,role:selRole});
+  btn.disabled=false;btn.textContent='Create Account →';
+  if(d.success){
+    toast('Account created! Check email for OTP 📧','success');
+    if(d.dev_otp) toast('Dev OTP: '+d.dev_otp,'info');
+    setTimeout(()=>location.href=`/verify-otp?email=${encodeURIComponent(email)}`,1000);
+  } else toast(d.message||'Registration failed','error');
+}
+</script>
+</body>
+</html>
