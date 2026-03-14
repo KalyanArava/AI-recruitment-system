@@ -1,0 +1,106 @@
+# 🧠 Smart AI Recruitment System
+
+An intelligent recruitment platform that automates resume screening using **Machine Learning and NLP**.
+
+This system helps recruiters quickly identify the best candidates by analyzing resumes and matching them with job descriptions using AI.
+
+---
+
+## 🚀 Features
+
+### 👤 User Roles
+- Admin
+- Recruiter
+- Candidate
+
+### 📄 Resume Processing
+- Upload PDF resumes
+- Automatic text extraction
+- Skill extraction using NLP
+
+### 🤖 AI Resume Scoring
+- TF-IDF similarity
+- BERT semantic matching
+- Final score calculation
+
+### 🏆 Candidate Ranking
+- Candidates ranked by AI match score
+- Top candidates automatically shortlisted
+
+### 📊 Admin Analytics Dashboard
+- Total users
+- Total jobs
+- Applications
+- Shortlisted candidates
+- Interactive charts (Chart.js)
+
+### 💡 AI Job Recommendations
+- Suggests jobs based on candidate skills
+
+### 📈 Resume Skill Visualization
+- Skill distribution analysis
+- Graph-based visualization
+
+### 📧 Email OTP Authentication
+- Secure login with OTP verification
+
+---
+
+## 🏗️ System Architecture
+Frontend (HTML / CSS / JS)
+│
+▼
+Flask Backend (Auth, Jobs, Dashboard)
+│
+▼
+FastAPI AI Service (Resume Scoring)
+│
+▼
+PostgreSQL / SQLite Database
+
+---
+
+## ⚙️ Technologies Used
+
+### Backend
+- Flask
+- FastAPI
+- SQLAlchemy
+- Flask-JWT
+- Flask-Mail
+
+### AI / NLP
+- Sentence Transformers (BERT)
+- Scikit-learn
+- TF-IDF Vectorization
+
+### Frontend
+- HTML
+- CSS (Glassmorphism UI)
+- JavaScript
+- Chart.js
+
+### Database
+- SQLite (development)
+- PostgreSQL (production)
+
+---
+
+## 📂 Project Structure
+
+```bash
+smart_recruitment/
+│
+├── backend/
+│   ├── routes/
+│   ├── models/
+│   ├── ml/
+│   └── app.py
+│
+├── frontend/
+│   ├── templates/
+│   └── static/
+│
+├── run.py
+├── requirements.txt
+└── README.md
