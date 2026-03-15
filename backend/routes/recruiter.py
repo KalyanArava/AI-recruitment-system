@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from app import db
 from models.user import User
 from models.models import Job, Resume, Application, AuditLog
-from ml.scorer import extract_text_from_pdf, compute_final_score, apply_shortlisting
+from backend.ml.scorer import extract_text_from_pdf, compute_final_score, apply_shortlisting
 from datetime import datetime
 import os, zipfile, io
 

@@ -11,35 +11,39 @@ import numpy as np
 # ─── Text Extraction ──────────────────────────────────────────────────────────
 
 def extract_text_from_pdf(filepath):
-    """Extract raw text from a PDF resume."""
+
     text = ""
+
     try:
         import pdfplumber
+
         with pdfplumber.open(filepath) as pdf:
             for page in pdf.pages:
-                t = page.extract_text()
-                if t:
-                    text += t + "\n"
-    except Exception:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+
+    except Exception as e:
+        print("pdfplumber failed:", e)
+
+    # fallback to PyPDF2
+    if len(text.strip()) < 50:
+
         try:
             import PyPDF2
-            with open(filepath, 'rb') as f:
+
+            with open(filepath, "rb") as f:
                 reader = PyPDF2.PdfReader(f)
+
                 for page in reader.pages:
-                    t = page.extract_text()
-                    if t:
-                        text += t + "\n"
+                    page_text = page.extract_text()
+                    if page_text:
+                        text += page_text + "\n"
+
         except Exception as e:
-            text = f"[Error extracting PDF: {str(e)}]"
+            print("PyPDF2 failed:", e)
+
     return text.strip()
-
-
-def clean_text(text):
-    """Normalize text for NLP processing."""
-    text = text.lower()
-    text = re.sub(r'[^a-z0-9\s]', ' ', text)
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text
 
 
 # ─── TF-IDF Scoring ───────────────────────────────────────────────────────────
