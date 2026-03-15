@@ -1,7 +1,10 @@
 """
 Smart AI Recruitment System — Entry Point
 """
-import sys, os, subprocess
+
+import sys
+import os
+import subprocess
 
 # ── Auto-install missing packages ──────────────────────────────
 REQUIRED = [
@@ -11,6 +14,7 @@ REQUIRED = [
 ]
 
 print("🔍 Checking dependencies...")
+
 missing = []
 for pkg in REQUIRED:
     try:
@@ -20,21 +24,28 @@ for pkg in REQUIRED:
 
 if missing:
     print(f"📦 Installing missing packages: {', '.join(missing)}")
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install'] + missing)
+    subprocess.check_call([sys.executable, "-m", "pip", "install"] + missing)
     print("✅ Packages installed!\n")
 else:
     print("✅ All packages ready!\n")
 
-# ── Set up paths ────────────────────────────────────────────────
+
+# ── Setup Paths ────────────────────────────────────────────────
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BACKEND  = os.path.join(BASE_DIR, 'backend')
+BACKEND = os.path.join(BASE_DIR, "backend")
 
 sys.path.insert(0, BACKEND)
 
 from app import create_app
 
-if __name__ == '__main__':
-    app = create_app()
+# IMPORTANT for deployment
+app = create_app()
+
+
+# ── Run Local Server ───────────────────────────────────────────
+
+if __name__ == "__main__":
 
     print("\n" + "="*60)
     print("  🤖 Smart AI Recruitment — Glassmorphism UI")
@@ -43,4 +54,4 @@ if __name__ == '__main__':
     print("  🔐  admin@recruitment.com  /  Admin@123")
     print("="*60 + "\n")
 
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    app.run(debug=True, port=5000, host="0.0.0.0")
